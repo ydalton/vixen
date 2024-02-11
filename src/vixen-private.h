@@ -6,6 +6,8 @@
 #include <stdlib.h> 
 #include <stdio.h>
 
+#include "xdg-shell-client-protocol.h"
+
 #define	VIXEN_LOG(...) 		(fprintf(stderr, "[LOG] libvixen: " __VA_ARGS__))
 #define	VIXEN_ERROR(...) 	(fprintf(stderr, "[ERROR] libvixen: " __VA_ARGS__))
 #define	VIXEN_FATAL(...) 	(fprintf(stderr, "[FATAL] libvixen: " __VA_ARGS__))
@@ -24,6 +26,7 @@ struct __vixen_state_t {
 	struct wl_compositor *compositor;
 	struct wl_shm *shm;
 	struct wl_seat *seat;
+	struct xdg_wm_base *wm_base;
 };
 
 extern struct __vixen_state_t *vixen;

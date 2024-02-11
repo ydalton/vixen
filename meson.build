@@ -1,7 +1,7 @@
 project('vixen', 'c',
   version: '1.0',
   default_options: [
-    'warning_level=4',
+    'warning_level=3',
     'optimization=2',
   ]
 )
@@ -13,6 +13,7 @@ compiler_flags = [
   '-Wno-unused-parameter',
   '-Werror=incompatible-pointer-types',
   '-Werror=implicit-function-declaration',
+  '-Werror=return-type',
 ]
 
 cc = meson.get_compiler('c')
@@ -24,4 +25,6 @@ add_project_arguments(
 incdir = include_directories('include')
 
 subdir('src')
-subdir('examples')
+if get_option('examples')
+  subdir('examples')
+endif

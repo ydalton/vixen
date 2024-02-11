@@ -1,11 +1,18 @@
-#include <stdlib.h>
 #include <string.h>
-#include <wayland-client.h>
 
 #include "vixen/vixen.h"
 #include "vixen-private.h"
 
 struct __vixen_state_t *vixen = NULL;
+
+static void handle_ping(void *data, struct xdg_wm_base *wm_base, uint32_t serial)
+{
+	xdg_wm_base_pong(wm_base, serial);
+}
+
+static struct xdg_wm_base_listener wm_base_listener = {
+	.ping = handle_ping,
+};
 
 static void handle_global(void *data, struct wl_registry *registry,
 			  uint32_t name, const char *interface, uint32_t version)
@@ -17,9 +24,16 @@ static void handle_global(void *data, struct wl_registry *registry,
 		vixen->shm = wl_registry_bind(registry, name,
 						&wl_shm_interface, version);
 	} else if(strcmp(interface, wl_seat_interface.name) == 0) {
+		/* Only to the interface if we actually need it */
 		if(vixen->flags & VX_USE_INPUT)
 			vixen->seat = wl_registry_bind(registry, name,
 						&wl_seat_interface, version);
+	} else if(strcmp(interface, xdg_wm_base_interface.name) == 0) {
+		vixen->wm_base = wl_registry_bind(registry, name,
+						  &xdg_wm_base_interface,
+						  version);
+		xdg_wm_base_add_listener(vixen->wm_base, &wm_base_listener,
+					 vixen);
 	}
 }
 
