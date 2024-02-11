@@ -1,0 +1,4 @@
+option('examples',
+  description: 'Compile the examples',
+  type: 'boolean',
+  value: false)

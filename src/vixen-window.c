@@ -1,7 +1,17 @@
-#include "vixen/vixen.h"
+#include <wayland-client.h>
+#include <assert.h>
 
+#include "xdg-shell-client-protocol.h"
+
+#include "vixen/vixen.h"
 #include "vixen-private.h"
-#include "vixen-window.h"
+
+struct __vixen_window_internal {
+	struct wl_display *display;
+	struct wl_surface *surface;
+	struct xdg_surface *xdg_surface;
+	struct xdg_toplevel *toplevel;
+};
 
 static void handle_toplevel_close(void *data, struct xdg_toplevel *toplevel)
 {
@@ -44,7 +54,19 @@ static struct xdg_toplevel_listener toplevel_listener = {
 static void handle_surface_configure(void *data, struct xdg_surface *surface,
 								uint32_t serial)
 {
+	struct __vixen_window_internal *internal;
+	struct wl_buffer *buffer;
+	vixen_window_t *window;
+
+	window = data;
+	internal = window->internal;
+
 	xdg_surface_ack_configure(surface, serial);
+
+	buffer = create_window_buffer(window);
+	assert(buffer != NULL);
+	wl_surface_attach(internal->surface, buffer, 0, 0);
+	wl_surface_commit(internal->surface);
 }
 
 static struct xdg_surface_listener surface_listener = {
@@ -56,6 +78,7 @@ VX_EXPORT vixen_window_t *vixen_window_create(int width, int height,
 						const char *id, int flags)
 {
 	vixen_window_t *win;
+	struct __vixen_window_internal *internal;
 
 	if(!vixen) {
 		if(vixen->debug)
@@ -87,18 +110,26 @@ VX_EXPORT vixen_window_t *vixen_window_create(int width, int height,
 	win->flags = flags;
 	win->running = VX_TRUE;
 
-	win->surface = wl_compositor_create_surface(vixen->compositor);
-	win->xdg_surface = xdg_wm_base_get_xdg_surface(vixen->wm_base, win->surface);
-	xdg_surface_add_listener(win->xdg_surface, &surface_listener, win);
+	internal = VX_MALLOC(sizeof(struct __vixen_window_internal));
+	if(!internal)
+		goto err;
 
-	win->toplevel = xdg_surface_get_toplevel(win->xdg_surface);
-	xdg_toplevel_set_app_id(win->toplevel, win->app_id);
-	xdg_toplevel_set_title(win->toplevel, win->name);
-	xdg_toplevel_add_listener(win->toplevel, &toplevel_listener, win);
+	internal->surface = wl_compositor_create_surface(vixen->compositor);
+	internal->xdg_surface = xdg_wm_base_get_xdg_surface(vixen->wm_base, internal->surface);
+	xdg_surface_add_listener(internal->xdg_surface, &surface_listener, win);
 
-	wl_surface_commit(win->surface);
+	internal->toplevel = xdg_surface_get_toplevel(internal->xdg_surface);
+	xdg_toplevel_set_app_id(internal->toplevel, win->app_id);
+	xdg_toplevel_set_title(internal->toplevel, win->name);
+	xdg_toplevel_add_listener(internal->toplevel, &toplevel_listener, win);
+	wl_surface_commit(internal->surface);
+
+	win->internal = internal;
 
 	return win;
+err:
+	VX_FREE(win);
+	return NULL;
 }
 
 VX_EXPORT VX_BOOL vixen_window_is_running(vixen_window_t *window)
@@ -108,14 +139,17 @@ VX_EXPORT VX_BOOL vixen_window_is_running(vixen_window_t *window)
 
 VX_EXPORT void vixen_window_destroy(vixen_window_t *window)
 {
-	xdg_toplevel_destroy(window->toplevel);
-	xdg_surface_destroy(window->xdg_surface);
-	wl_surface_destroy(window->surface);
+	struct __vixen_window_internal *internal = window->internal;
+	
+	xdg_toplevel_destroy(internal->toplevel);
+	xdg_surface_destroy(internal->xdg_surface);
+	wl_surface_destroy(internal->surface);
+	VX_FREE(window->internal);
 	VX_FREE(window);
 }
 
 VX_EXPORT void vixen_window_set_frame_callback(vixen_window_t *window,
-		void (*func)(vixen_window_t *window, void* mem))
+		void (*func)(vixen_window_t *window, uint32_t* mem))
 {
 	window->frame_callback = func;
 }

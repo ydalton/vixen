@@ -31,4 +31,6 @@ struct __vixen_state_t {
 
 extern struct __vixen_state_t *vixen;
 
+struct wl_buffer *create_window_buffer(vixen_window_t *window);
+
 #endif

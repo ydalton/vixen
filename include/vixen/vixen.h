@@ -10,8 +10,23 @@
 #define	VX_TRUE 	1
 #define VX_FALSE 	0
 
+#include <stdint.h>
+
 typedef unsigned int VX_BOOL;
+
+/* dumb */
+struct vixen_window_t;
 typedef struct vixen_window_t vixen_window_t;
+
+struct vixen_window_t {
+	void *internal;
+	int width, height;
+	int flags;
+	VX_BOOL running;
+	const char *name;
+	const char *app_id;
+	void (*frame_callback)(vixen_window_t *window, uint32_t* mem);
+};
 
 enum {
 	VX_USE_INPUT = 1,
@@ -29,7 +44,7 @@ VX_EXPORT void vixen_exit(void);
 
 VX_EXPORT vixen_window_t *vixen_window_create(int width, int height, const char *name, const char *id, int flags);
 VX_EXPORT void vixen_window_destroy(vixen_window_t *window);
-VX_EXPORT void vixen_window_set_frame_callback(vixen_window_t *window, void (*func)(void *mem));
+VX_EXPORT void vixen_window_set_frame_callback(vixen_window_t *window, void (*func)(vixen_window_t *window, uint32_t *mem));
 VX_EXPORT VX_BOOL vixen_window_is_running(vixen_window_t *window);
 
 #endif
