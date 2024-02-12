@@ -22,7 +22,6 @@
 	} while(0)	
 
 struct __vixen_state_t {
-	int flags;
 	VX_BOOL debug;
 	struct wl_display *display;
 	struct wl_compositor *compositor;

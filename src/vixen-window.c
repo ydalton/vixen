@@ -91,9 +91,9 @@ VX_EXPORT vixen_window_t *vixen_window_create(int width, int height,
 		return NULL;
 	}
 
-	if(vixen->flags & VX_USE_INPUT && !vixen->seat) {
+	if(!vixen->seat) {
 		if(vixen->debug)
-			VIXEN_ERROR("Input was asked but the compositor does not support the %s interface.",
+			VIXEN_ERROR("Your Wayland compositor does not support the %s interface.",
 					wl_seat_interface.name);
 		return NULL;
 	}

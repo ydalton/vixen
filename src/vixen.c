@@ -23,9 +23,7 @@ static void handle_global(void *data, struct wl_registry *registry,
 		vixen->shm = wl_registry_bind(registry, name,
 						&wl_shm_interface, version);
 	} else if(strcmp(interface, wl_seat_interface.name) == 0) {
-		/* Only to the interface if we actually need it */
-		if(vixen->flags & VX_USE_INPUT)
-			vixen->seat = wl_registry_bind(registry, name,
+		vixen->seat = wl_registry_bind(registry, name,
 						&wl_seat_interface, version);
 	} else if(strcmp(interface, xdg_wm_base_interface.name) == 0) {
 		vixen->wm_base = wl_registry_bind(registry, name,
@@ -45,7 +43,7 @@ static struct wl_registry_listener registry_listener = {
 	.global_remove = handle_global_remove,
 };
 
-VX_EXPORT int vixen_init(int flags)
+VX_EXPORT int vixen_init()
 {
 	struct wl_registry *registry;
 
@@ -57,7 +55,6 @@ VX_EXPORT int vixen_init(int flags)
 	if(!vixen)
 		return EXIT_FAILURE;
 
-	vixen->flags = flags;
 	if(getenv("VIXEN_DEBUG"))
 		vixen->debug = VX_TRUE;
 

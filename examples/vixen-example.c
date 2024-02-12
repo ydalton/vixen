@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 	vixen_window_t *window;
 	int ret;
 
-	ret = vixen_init(0);
+	ret = vixen_init();
 	if(ret)
 		eprintf("Vixen failed to start!\n");
 

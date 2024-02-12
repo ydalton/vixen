@@ -39,7 +39,7 @@ enum {
 	VX_WINDOW_STATIC = 2,
 };
 
-VX_EXPORT int vixen_init(int flags);
+VX_EXPORT int vixen_init(void);
 VX_EXPORT void vixen_exit(void);
 
 VX_EXPORT vixen_window_t *vixen_window_create(int width, int height, const char *name, const char *id, int flags);
