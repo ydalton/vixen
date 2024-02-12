@@ -40,7 +40,8 @@ int main(int argc, char **argv)
 	if(ret)
 		eprintf("Vixen failed to start!\n");
 
-	window = vixen_window_create(400, 400, "Example window", "vixen-example", 0);
+	window = vixen_window_create(400, 400, "Example window", "vixen-example",
+					VX_WINDOW_RESIZEABLE);
 	if(!window)
 		eprintf("Failed to create window!\n");
 

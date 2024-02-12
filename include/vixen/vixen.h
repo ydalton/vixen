@@ -35,7 +35,7 @@ enum {
 };
 
 enum { 
-	VX_WINDOW_RESIZABLE = 1,
+	VX_WINDOW_RESIZEABLE = 1,
 	VX_WINDOW_STATIC = 2,
 };
 

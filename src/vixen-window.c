@@ -31,8 +31,10 @@ static void handle_toplevel_configure(void *data, struct xdg_toplevel *toplevel,
 	if(width == 0 || height == 0)
 		return;
 
-	win->width = width;
-	win->height = height;
+	if(win->flags & VX_WINDOW_RESIZEABLE) {
+		win->width = width;
+		win->height = height;
+	}
 }
 
 static void handle_toplevel_configure_bounds(void *data, struct xdg_toplevel *toplevel,
@@ -76,7 +78,7 @@ VX_EXPORT vixen_window_t *vixen_window_create(int width, int height,
 						const char *name,
 						const char *id, int flags)
 {
-	vixen_window_t *win;
+	vixen_window_t *window;
 	struct __vixen_window_internal *internal;
 
 	if(!vixen) {
@@ -98,16 +100,16 @@ VX_EXPORT vixen_window_t *vixen_window_create(int width, int height,
 		return NULL;
 	}
 
-	win = VX_MALLOC(sizeof(*win));
-	if(!win)
+	window = VX_MALLOC(sizeof(*window));
+	if(!window)
 		return NULL;
 
-	win->width = width;
-	win->height = height;
-	win->name = name;
-	win->app_id = id;
-	win->flags = flags;
-	win->running = VX_TRUE;
+	window->width = width;
+	window->height = height;
+	window->name = name;
+	window->app_id = id;
+	window->flags = flags;
+	window->running = VX_TRUE;
 
 	internal = VX_MALLOC(sizeof(struct __vixen_window_internal));
 	if(!internal)
@@ -115,19 +117,27 @@ VX_EXPORT vixen_window_t *vixen_window_create(int width, int height,
 
 	internal->surface = wl_compositor_create_surface(vixen->compositor);
 	internal->xdg_surface = xdg_wm_base_get_xdg_surface(vixen->wm_base, internal->surface);
-	xdg_surface_add_listener(internal->xdg_surface, &surface_listener, win);
+	xdg_surface_add_listener(internal->xdg_surface, &surface_listener, window);
 
 	internal->toplevel = xdg_surface_get_toplevel(internal->xdg_surface);
-	xdg_toplevel_set_app_id(internal->toplevel, win->app_id);
-	xdg_toplevel_set_title(internal->toplevel, win->name);
-	xdg_toplevel_add_listener(internal->toplevel, &toplevel_listener, win);
+	xdg_toplevel_set_app_id(internal->toplevel, window->app_id);
+	xdg_toplevel_set_title(internal->toplevel, window->name);
+	xdg_toplevel_add_listener(internal->toplevel, &toplevel_listener, window);
+
+	if(!(window->flags & VX_WINDOW_RESIZEABLE)) {
+		xdg_toplevel_set_min_size(internal->toplevel, window->width,
+					  window->height);
+		xdg_toplevel_set_max_size(internal->toplevel, window->width,
+					  window->height);
+	}
+
 	wl_surface_commit(internal->surface);
 
-	win->internal = internal;
+	window->internal = internal;
 
-	return win;
+	return window;
 err:
-	VX_FREE(win);
+	VX_FREE(window);
 	return NULL;
 }
 
