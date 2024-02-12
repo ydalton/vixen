@@ -1,6 +1,5 @@
 #include <string.h>
 
-#include "vixen/vixen.h"
 #include "vixen-private.h"
 
 struct __vixen_state_t *vixen = NULL;

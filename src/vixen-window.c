@@ -3,7 +3,6 @@
 
 #include "xdg-shell-client-protocol.h"
 
-#include "vixen/vixen.h"
 #include "vixen-private.h"
 
 struct __vixen_window_internal {

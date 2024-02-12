@@ -1,4 +1,4 @@
-#include "vixen/vixen.h"
+#include <vixen/vixen.h>
 
 #include <stdio.h>
 

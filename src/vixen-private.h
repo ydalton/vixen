@@ -6,6 +6,8 @@
 #include <stdlib.h> 
 #include <stdio.h>
 
+#include <vixen/vixen.h>
+
 #include "xdg-shell-client-protocol.h"
 
 #define	VIXEN_LOG(...) 		(fprintf(stderr, "[LOG] libvixen: " __VA_ARGS__))

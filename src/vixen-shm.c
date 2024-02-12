@@ -4,8 +4,6 @@
 #include <fcntl.h>
 #include <time.h>
 
-#include "vixen/vixen.h"
-
 #include "vixen-private.h"
 
 static void randname(char *buf)
