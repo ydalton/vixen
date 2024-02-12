@@ -25,6 +25,8 @@ add_project_arguments(
 incdir = include_directories('include')
 
 subdir('src')
+subdir('include')
+
 if get_option('examples')
   subdir('examples')
 endif

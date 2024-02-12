@@ -65,5 +65,6 @@ libvixen = library(
   'vixen', 
   vixen_sources,
   dependencies: vixen_dependencies,
+  install: true,
   include_directories: incdir
 )
