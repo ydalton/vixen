@@ -55,6 +55,7 @@ vixen_sources = [
   'vixen.c',
   'vixen-shm.c',
   'vixen-window.c',
+  'vixen-wayland.c',
 ]
 
 vixen_dependencies = [

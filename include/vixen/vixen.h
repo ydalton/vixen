@@ -47,4 +47,8 @@ VX_EXPORT void vixen_window_destroy(vixen_window_t *window);
 VX_EXPORT void vixen_window_set_frame_callback(vixen_window_t *window, void (*func)(vixen_window_t *window, uint32_t *mem));
 VX_EXPORT VX_BOOL vixen_window_is_running(vixen_window_t *window);
 
+#ifdef VIXEN_EXPOSE_WAYLAND
+#include <vixen/vixen-wayland.h>
+#endif
+
 #endif
