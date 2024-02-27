@@ -1,5 +1,6 @@
 project('vixen', 'c',
   version: '1.0',
+  license: 'MIT',
   default_options: [
     'warning_level=3',
     'optimization=2',
